@@ -1,0 +1,60 @@
+eureka:
+    client:
+        serviceUrl:
+            defaultZone: http://localhost:8761/eureka
+
+server:
+    port: 8082
+spring:
+    application:
+        name: staff-app
+    datasource:
+        password: Subasil@8086
+        url: jdbc:mysql://localhost:3306/staff
+        username: root
+    jpa:
+        hibernate:
+            ddl-auto: create
+        properties:
+            hibernate:
+                dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+                format_sql: true
+        show-sql: true
+    main:
+        allow-circular-references: true
+
+
+#actuator configuration
+
+management:
+    health:
+        circuitbreakers:
+            enabled: true
+    endpoints:
+        web:
+            exposure:
+                include: health
+    endpoint:
+        health:
+            show-details: always
+
+resilience4j:
+    circuitbreaker:
+        instances:
+            staff:
+                registerHealthIndicator: true
+                eventConsumerBufferSize: 10
+                failureRateThreshold: 50
+                minimumNumberOfCalls: 5
+                automaticTransitionFromOpenToHalfOpenEnabled: true
+                waitDurationInOpenState: 5s
+                permittedNumberOfCallsInHalfOpenState: 3
+                slidingWindowSize: 10
+                slidingWindowType: COUNT_BASED
+
+    retry:
+        instances:
+            staff:
+                registerHealthIndicator: true
+                maxRetryAttempts: 3
+                waitDuration: 10s
